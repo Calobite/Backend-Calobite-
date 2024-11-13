@@ -1,0 +1,11 @@
+/food - GET filter
+/food/id GET detail food
+
+/user - GET
+
+/login - POST
+
+/Register - POST
+
+/articles - GET
+/articles/id GET detaill article
