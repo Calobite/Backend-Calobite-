@@ -1,5 +1,5 @@
-const { register, login } = require('./handler');
-//getExercise, getAllExercise, getDetailUser, addCalories, getDailyCalories, submission, StartMission, FinishMission
+const { register, login, getUserEmail } = require('./handler');
+//getAllExercise, getDetailUser, addCalories, getDailyCalories, submission, StartMission, FinishMission
 
 const routes = [
     {
@@ -11,13 +11,13 @@ const routes = [
         method: 'POST',
         path: '/login',
         handler: login
-    },
-     /*
+    }, 
     {
-        method: 'POST',
-        path: '/requestpass',
-        handler: requestPasswordReset
+        method: 'GET',
+        path: '/user/{userId}',
+        handler: getUserEmail
     },
+    /*
     {
         method: 'POST',
         path: '/resetpass',

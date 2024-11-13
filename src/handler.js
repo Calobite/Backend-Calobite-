@@ -82,3 +82,27 @@ exports.login = async (request, h) => {
         return h.response({ error: 'Server error' }).code(500);
     }
 };
+
+exports.getUserEmail = async (request, h) => {
+    const { userId } = request.params;  // Ambil userId dari parameter URL
+
+    try {
+        // Query untuk mengambil email berdasarkan userId
+        const user = await new Promise((resolve, reject) => {
+            db.query('SELECT email FROM users WHERE user_id = ?', [userId], (error, results) => {
+                if (error) return reject(error);
+                resolve(results[0]);
+            });
+        });
+        // Cek apakah user ditemukan
+        if (!user) {
+            return h.response({ error: 'User not found' }).code(404);
+        }
+
+        // Kembalikan email user
+        return h.response({ email: user.email }).code(200);
+    } catch (error) {
+        console.error(error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
