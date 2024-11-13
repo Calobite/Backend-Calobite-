@@ -1,5 +1,5 @@
-const { register, } = require('./handler');
-//login, getExercise, getAllExercise, getDetailUser, addCalories, getDailyCalories, submission, StartMission, FinishMission
+const { register, login } = require('./handler');
+//getExercise, getAllExercise, getDetailUser, addCalories, getDailyCalories, submission, StartMission, FinishMission
 
 const routes = [
     {
@@ -7,12 +7,12 @@ const routes = [
         path: '/register',
         handler: register
     },
-    /*
     {
         method: 'POST',
         path: '/login',
         handler: login
     },
+     /*
     {
         method: 'POST',
         path: '/requestpass',
