@@ -106,3 +106,199 @@ exports.getUserEmail = async (request, h) => {
         return h.response({ error: 'Server error' }).code(500);
     }
 };
+
+exports.getFoods = async (request, h) => {
+    const { category, maxPrice } = request.query;  // Ambil query parameter untuk filter
+
+    try {
+        // Query dasar
+        let sql = 'SELECT * FROM recipes_1 WHERE 1=1';
+        const params = [];
+
+        // Tambahkan filter kategori jika tersedia
+        if (category) {
+            sql += ' AND category = ?';
+            params.push(category);
+        }
+
+        // Tambahkan filter harga maksimum jika tersedia
+        if (maxPrice) {
+            sql += ' AND price <= ?';
+            params.push(parseInt(maxPrice));
+        }
+
+        // Eksekusi query
+        const foods = await new Promise((resolve, reject) => {
+            db.query(sql, params, (error, results) => {
+                if (error) return reject(error);
+                resolve(results);
+            });
+        });
+
+        // Kembalikan hasil
+        return h.response(foods).code(200);
+    } catch (error) {
+        console.error(error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+exports.getFoodDetail = async (request, h) => {
+    const { id } = request.params;  // Ambil id dari parameter URL
+
+    try {
+        // Query untuk mencari makanan berdasarkan id
+        const food = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM recipes_1 WHERE recipes_id = ?', [id], (error, results) => {
+                if (error) return reject(error);
+                resolve(results[0]);
+            });
+        });
+
+        // Jika makanan tidak ditemukan
+        if (!food) {
+            return h.response({ error: 'Food not found' }).code(404);
+        }
+
+        // Kembalikan detail makanan
+        return h.response(food).code(200);
+    } catch (error) {
+        console.error(error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+// Handler untuk mendapatkan semua ingredients
+exports.getIngredients = async (request, h) => {
+    try {
+        const ingredients = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM food_calories', (error, results) => {
+                if (error) {
+                    console.error("SQL Error:", error);
+                    return reject(error);
+                }
+                resolve(results);
+            });
+        });
+        return h.response(ingredients).code(200);
+    } catch (error) {
+        console.error("Error in getIngredients:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+// Handler untuk mendapatkan detail ingredient berdasarkan ID
+exports.getIngredientById = async (request, h) => {
+    const { id } = request.params;
+    try {
+        const ingredient = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM ingredients WHERE ingredient_id = ?', [id], (error, results) => {
+                if (error) {
+                    console.error("SQL Error:", error);
+                    return reject(error);
+                }
+                resolve(results[0]);
+            });
+        });
+
+        if (!ingredient) {
+            return h.response({ error: 'Ingredient not found' }).code(404);
+        }
+
+        return h.response(ingredient).code(200);
+    } catch (error) {
+        console.error("Error in getIngredientById:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+// Handler untuk menambahkan ingredient baru
+exports.addIngredient = async (request, h) => {
+    const { name, quantity } = request.payload;
+
+    if (!name || !quantity) {
+        return h.response({ error: 'Name and quantity are required' }).code(400);
+    }
+
+    try {
+        await new Promise((resolve, reject) => {
+            db.query(
+                'INSERT INTO ingredients (name, quantity) VALUES (?, ?)',
+                [name, quantity],
+                (error) => {
+                    if (error) {
+                        console.error("SQL Error:", error);
+                        return reject(error);
+                    }
+                    resolve();
+                }
+            );
+        });
+
+        return h.response({ message: 'Ingredient added successfully' }).code(201);
+    } catch (error) {
+        console.error("Error in addIngredient:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+// Handler untuk memperbarui ingredient berdasarkan ID
+exports.updateIngredient = async (request, h) => {
+    const { id } = request.params;
+    const { name, quantity } = request.payload;
+
+    if (!name || !quantity) {
+        return h.response({ error: 'Name and quantity are required' }).code(400);
+    }
+
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query(
+                'UPDATE ingredients SET name = ?, quantity = ? WHERE id = ?',
+                [name, quantity, id],
+                (error, results) => {
+                    if (error) {
+                        console.error("SQL Error:", error);
+                        return reject(error);
+                    }
+                    resolve(results);
+                }
+            );
+        });
+
+        if (result.affectedRows === 0) {
+            return h.response({ error: 'Ingredient not found' }).code(404);
+        }
+
+        return h.response({ message: 'Ingredient updated successfully' }).code(200);
+    } catch (error) {
+        console.error("Error in updateIngredient:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
+// Handler untuk menghapus ingredient berdasarkan ID
+exports.deleteIngredient = async (request, h) => {
+    const { id } = request.params;
+
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query('DELETE FROM ingredients WHERE id = ?', [id], (error, results) => {
+                if (error) {
+                    console.error("SQL Error:", error);
+                    return reject(error);
+                }
+                resolve(results);
+            });
+        });
+
+        if (result.affectedRows === 0) {
+            return h.response({ error: 'Ingredient not found' }).code(404);
+        }
+
+        return h.response({ message: 'Ingredient deleted successfully' }).code(200);
+    } catch (error) {
+        console.error("Error in deleteIngredient:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};

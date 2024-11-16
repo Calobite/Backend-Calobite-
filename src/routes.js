@@ -1,4 +1,4 @@
-const { register, login, getUserEmail } = require('./handler');
+const { register, login, getUserEmail, getFoods, getFoodDetail, getIngredients, getIngredientById, addIngredient, updateIngredient, deleteIngredient} = require('./handler');
 //getAllExercise, getDetailUser, addCalories, getDailyCalories, submission, StartMission, FinishMission
 
 const routes = [
@@ -17,6 +17,48 @@ const routes = [
         path: '/user/{userId}',
         handler: getUserEmail
     },
+    {
+        method: 'GET',
+        path: '/food',
+        handler: getFoods
+        
+    },
+    {
+        method: 'GET',
+        path: '/food/{id}',
+        handler: getFoodDetail
+    },
+    {
+        method: 'GET',
+        path: '/ingredients',
+        handler: getIngredients
+    },
+    // Route untuk mendapatkan ingredient berdasarkan ID
+    {
+        method: 'GET',
+        path: '/ingredients/{id}',
+        handler: getIngredientById
+    },
+    // Route untuk menambahkan ingredient baru
+    {
+        method: 'POST',
+        path: '/ingredients',
+        handler: addIngredient
+    },
+    // Route untuk memperbarui ingredient berdasarkan ID
+    {
+        method: 'PUT',
+        path: '/ingredients/{id}',
+        handler: updateIngredient
+    },
+    // Route untuk menghapus ingredient berdasarkan ID
+    {
+        method: 'DELETE',
+        path: '/ingredients/{id}',
+        handler: deleteIngredient
+    }
+
+
     /*
     {
         method: 'POST',
