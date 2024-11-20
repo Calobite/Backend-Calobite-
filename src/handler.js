@@ -5,13 +5,11 @@ const db = require('./dbhandler');
 exports.register = async (request, h) => {
     const { email, password } = request.payload;
 
-    // Validasi data input
     if (!email || !password) {
         return h.response({ error: 'Email and password are required' }).code(400);
     }
 
     try {
-        // Cek apakah email sudah terdaftar
         const userExists = await new Promise((resolve, reject) => {
             db.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
                 if (error) return reject(error);
@@ -23,10 +21,8 @@ exports.register = async (request, h) => {
             return h.response({ error: 'Email already registered' }).code(400);
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insert user ke database
         await new Promise((resolve, reject) => {
             db.query(
                 'INSERT INTO users (email, password) VALUES (?, ?)',
@@ -49,13 +45,11 @@ exports.register = async (request, h) => {
 exports.login = async (request, h) => {
     const { email, password } = request.payload;
 
-    // Validasi input
     if (!email || !password) {
         return h.response({ error: 'Email and password are required' }).code(400);
     }
 
     try {
-        // Cari pengguna berdasarkan email
         const user = await new Promise((resolve, reject) => {
             db.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
                 if (error) return reject(error);
@@ -63,19 +57,16 @@ exports.login = async (request, h) => {
             });
         });
 
-        // Jika user tidak ditemukan
         if (!user) {
             return h.response({ error: 'Invalid email or password' }).code(401);
         }
 
-        // Cek password yang diinput dengan password yang di-hash
         const isPasswordMatch = await bcrypt.compare(password, user.password);
 
         if (!isPasswordMatch) {
             return h.response({ error: 'Invalid email or password' }).code(401);
         }
 
-        // Jika login berhasil, bisa kirimkan data pengguna atau token (jika menggunakan autentikasi berbasis token)
         return h.response({ message: 'Login successful', user: { email: user.email } }).code(200);
     } catch (error) {
         console.error(error);
@@ -84,22 +75,19 @@ exports.login = async (request, h) => {
 };
 
 exports.getUserEmail = async (request, h) => {
-    const { userId } = request.params;  // Ambil userId dari parameter URL
+    const { userId } = request.params;
 
     try {
-        // Query untuk mengambil email berdasarkan userId
         const user = await new Promise((resolve, reject) => {
             db.query('SELECT email FROM users WHERE user_id = ?', [userId], (error, results) => {
                 if (error) return reject(error);
                 resolve(results[0]);
             });
         });
-        // Cek apakah user ditemukan
         if (!user) {
             return h.response({ error: 'User not found' }).code(404);
         }
 
-        // Kembalikan email user
         return h.response({ email: user.email }).code(200);
     } catch (error) {
         console.error(error);
@@ -108,26 +96,22 @@ exports.getUserEmail = async (request, h) => {
 };
 
 exports.getFoods = async (request, h) => {
-    const { category, maxPrice } = request.query;  // Ambil query parameter untuk filter
+    const { category, maxPrice } = request.query;
 
     try {
-        // Query dasar
         let sql = 'SELECT * FROM recipes_1 WHERE 1=1';
         const params = [];
 
-        // Tambahkan filter kategori jika tersedia
         if (category) {
             sql += ' AND category = ?';
             params.push(category);
         }
 
-        // Tambahkan filter harga maksimum jika tersedia
         if (maxPrice) {
             sql += ' AND price <= ?';
             params.push(parseInt(maxPrice));
         }
 
-        // Eksekusi query
         const foods = await new Promise((resolve, reject) => {
             db.query(sql, params, (error, results) => {
                 if (error) return reject(error);
@@ -135,7 +119,6 @@ exports.getFoods = async (request, h) => {
             });
         });
 
-        // Kembalikan hasil
         return h.response(foods).code(200);
     } catch (error) {
         console.error(error);
@@ -144,10 +127,9 @@ exports.getFoods = async (request, h) => {
 };
 
 exports.getFoodDetail = async (request, h) => {
-    const { id } = request.params;  // Ambil id dari parameter URL
+    const { id } = request.params;
 
     try {
-        // Query untuk mencari makanan berdasarkan id
         const food = await new Promise((resolve, reject) => {
             db.query('SELECT * FROM recipes_1 WHERE recipes_id = ?', [id], (error, results) => {
                 if (error) return reject(error);
@@ -155,12 +137,10 @@ exports.getFoodDetail = async (request, h) => {
             });
         });
 
-        // Jika makanan tidak ditemukan
         if (!food) {
             return h.response({ error: 'Food not found' }).code(404);
         }
 
-        // Kembalikan detail makanan
         return h.response(food).code(200);
     } catch (error) {
         console.error(error);
@@ -168,7 +148,6 @@ exports.getFoodDetail = async (request, h) => {
     }
 };
 
-// Handler untuk mendapatkan semua ingredients
 exports.getIngredients = async (request, h) => {
     try {
         const ingredients = await new Promise((resolve, reject) => {
@@ -187,7 +166,6 @@ exports.getIngredients = async (request, h) => {
     }
 };
 
-// Handler untuk mendapatkan detail ingredient berdasarkan ID
 exports.getIngredientById = async (request, h) => {
     const { id } = request.params;
     try {
@@ -212,7 +190,6 @@ exports.getIngredientById = async (request, h) => {
     }
 };
 
-// Handler untuk menambahkan ingredient baru
 exports.addIngredient = async (request, h) => {
     const { name, quantity } = request.payload;
 
@@ -242,7 +219,6 @@ exports.addIngredient = async (request, h) => {
     }
 };
 
-// Handler untuk memperbarui ingredient berdasarkan ID
 exports.updateIngredient = async (request, h) => {
     const { id } = request.params;
     const { name, quantity } = request.payload;
@@ -277,7 +253,6 @@ exports.updateIngredient = async (request, h) => {
     }
 };
 
-// Handler untuk menghapus ingredient berdasarkan ID
 exports.deleteIngredient = async (request, h) => {
     const { id } = request.params;
 
