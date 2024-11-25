@@ -99,7 +99,7 @@ exports.getFoods = async (request, h) => {
     const { category, maxPrice } = request.query;
 
     try {
-        let sql = 'SELECT * FROM recipes_1 WHERE 1=1';
+        let sql = 'SELECT * FROM recipes WHERE 1=1';
         const params = [];
 
         if (category) {
@@ -131,7 +131,7 @@ exports.getFoodDetail = async (request, h) => {
 
     try {
         const food = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM recipes_1 WHERE recipes_id = ?', [id], (error, results) => {
+            db.query('SELECT * FROM recipes WHERE recipes_id = ?', [id], (error, results) => {
                 if (error) return reject(error);
                 resolve(results[0]);
             });
