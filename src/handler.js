@@ -41,7 +41,6 @@ exports.register = async (request, h) => {
     }
 };
 
-
 exports.login = async (request, h) => {
     const { email, password } = request.payload;
 
@@ -179,6 +178,7 @@ exports.getIngredients = async (request, h) => {
         return h.response({ error: 'Server error' }).code(500);
     }
 };
+
 exports.getIngredientById = async (request, h) => {
     const { id } = request.params;
     try {
