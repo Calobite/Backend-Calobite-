@@ -190,6 +190,36 @@ exports.getIngredientById = async (request, h) => {
     }
 };
 
+exports.getIngredientByName = async (request, h) => {
+    const { name } = request.params; // Mengambil parameter `name` dari URL
+    try {
+        const ingredient = await new Promise((resolve, reject) => {
+            // Query SQL untuk mencari bahan berdasarkan nama
+            db.query(
+                'SELECT * FROM ingredients WHERE name LIKE ?',
+                [`%${name}%`], // Menggunakan wildcard untuk pencarian fleksibel
+                (error, results) => {
+                    if (error) {
+                        console.error("SQL Error:", error);
+                        return reject(error);
+                    }
+                    resolve(results);
+                }
+            );
+        });
+
+        if (ingredient.length === 0) {
+            // Jika tidak ada hasil
+            return h.response({ error: 'Ingredient not found' }).code(404);
+        }
+
+        return h.response(ingredient).code(200); // Mengembalikan hasil pencarian
+    } catch (error) {
+        console.error("Error in getIngredientByName:", error);
+        return h.response({ error: 'Server error' }).code(500);
+    }
+};
+
 exports.addIngredient = async (request, h) => {
     const { name, quantity } = request.payload;
 
