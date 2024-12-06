@@ -149,9 +149,17 @@ exports.getFoodDetail = async (request, h) => {
 };
 
 exports.getIngredients = async (request, h) => {
+    const { name } = request.query; // Ambil query parameter `name` jika ada
     try {
         const ingredients = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM food_calories', (error, results) => {
+            // Jika query parameter `name` ada, gunakan SQL dengan kondisi LIKE
+            const query = name 
+                ? 'SELECT * FROM food_calories WHERE Food LIKE ?' 
+                : 'SELECT * FROM food_calories';
+
+            const params = name ? [`%${name}%`] : []; // Parameter untuk query
+
+            db.query(query, params, (error, results) => {
                 if (error) {
                     console.error("SQL Error:", error);
                     return reject(error);
@@ -159,13 +167,18 @@ exports.getIngredients = async (request, h) => {
                 resolve(results);
             });
         });
-        return h.response(ingredients).code(200);
+
+        if (name && ingredients.length === 0) {
+            // Jika pencarian dengan `name` tidak menghasilkan apapun
+            return h.response({ error: 'Ingredient not found' }).code(404);
+        }
+
+        return h.response(ingredients).code(200); // Kembalikan hasil
     } catch (error) {
         console.error("Error in getIngredients:", error);
         return h.response({ error: 'Server error' }).code(500);
     }
 };
-
 exports.getIngredientById = async (request, h) => {
     const { id } = request.params;
     try {
@@ -186,36 +199,6 @@ exports.getIngredientById = async (request, h) => {
         return h.response(ingredient).code(200);
     } catch (error) {
         console.error("Error in getIngredientById:", error);
-        return h.response({ error: 'Server error' }).code(500);
-    }
-};
-
-exports.getIngredientByName = async (request, h) => {
-    const { name } = request.params; // Mengambil parameter `name` dari URL
-    try {
-        const ingredient = await new Promise((resolve, reject) => {
-            // Query SQL untuk mencari bahan berdasarkan nama
-            db.query(
-                'SELECT * FROM ingredients WHERE name LIKE ?',
-                [`%${name}%`], // Menggunakan wildcard untuk pencarian fleksibel
-                (error, results) => {
-                    if (error) {
-                        console.error("SQL Error:", error);
-                        return reject(error);
-                    }
-                    resolve(results);
-                }
-            );
-        });
-
-        if (ingredient.length === 0) {
-            // Jika tidak ada hasil
-            return h.response({ error: 'Ingredient not found' }).code(404);
-        }
-
-        return h.response(ingredient).code(200); // Mengembalikan hasil pencarian
-    } catch (error) {
-        console.error("Error in getIngredientByName:", error);
         return h.response({ error: 'Server error' }).code(500);
     }
 };
