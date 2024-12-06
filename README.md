@@ -39,7 +39,12 @@ GET /ingredients
 
 Get Ingredients by Id :
 ```bash
-GET /ingredients/{id}
+GET /ingredients/id/{id}
+```
+
+Get Ingredients by Name :
+```bash
+GET /ingredients/name/{name}
 ```
 
 Add Ingredients :
