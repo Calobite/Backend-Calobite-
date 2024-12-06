@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi');
 const { register, login, getUserEmail, getFoods, getFoodDetail, getIngredients, getIngredientById, 
-        getIngredientByName, addIngredient, updateIngredient, deleteIngredient} = require('./handler');
+        addIngredient, updateIngredient, deleteIngredient} = require('./handler');
 
 const routes = [
     {
@@ -32,7 +32,14 @@ const routes = [
     {
         method: 'GET',
         path: '/ingredients',
-        handler: getIngredients
+        handler: getIngredients,
+        options: {
+            validate: {
+                query: Joi.object({
+                    name: Joi.string().optional(), // `name` bersifat opsional
+                }),
+            },
+        },
     },
     {
         method: 'GET',
@@ -42,18 +49,6 @@ const routes = [
             validate: {
                 params: Joi.object({
                     id: Joi.number().integer().required(),
-                }),
-            },
-        },
-    },
-    {
-        method: 'GET',
-        path: '/ingredients/name/{name}',
-        handler: getIngredientByName,
-        options: {
-            validate: {
-                params: Joi.object({
-                    name: Joi.string().required(),
                 }),
             },
         },
