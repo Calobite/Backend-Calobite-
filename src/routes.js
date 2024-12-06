@@ -1,4 +1,6 @@
-const { register, login, getUserEmail, getFoods, getFoodDetail, getIngredients, getIngredientById, addIngredient, updateIngredient, deleteIngredient} = require('./handler');
+const Joi = require('@hapi/joi');
+const { register, login, getUserEmail, getFoods, getFoodDetail, getIngredients, getIngredientById, 
+        getIngredientByName, addIngredient, updateIngredient, deleteIngredient} = require('./handler');
 
 const routes = [
     {
@@ -34,8 +36,27 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/ingredients/{id}',
-        handler: getIngredientById
+        path: '/ingredients/id/{id}',
+        handler: getIngredientById,
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Joi.number().integer().required(),
+                }),
+            },
+        },
+    },
+    {
+        method: 'GET',
+        path: '/ingredients/name/{name}',
+        handler: getIngredientByName,
+        options: {
+            validate: {
+                params: Joi.object({
+                    name: Joi.string().required(),
+                }),
+            },
+        },
     },
     {
         method: 'POST',
