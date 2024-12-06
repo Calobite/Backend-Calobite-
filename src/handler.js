@@ -1,6 +1,8 @@
-// handler.js
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const db = require('./dbhandler');
+
+const SECRET_KEY = 'ec4270c9bd48b26abb4bcfb26b8f12c697a15053e7d5950bc7eb28728dec35az';
 
 exports.register = async (request, h) => {
     const { email, password } = request.payload;
@@ -34,7 +36,13 @@ exports.register = async (request, h) => {
             );
         });
 
-        return h.response({ message: 'User registered successfully' }).code(201);
+        // Buat JWT token untuk user yang baru terdaftar
+        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+
+        return h.response({ 
+            message: 'User registered successfully',
+            token
+        }).code(201);
     } catch (error) {
         console.error(error);
         return h.response({ error: 'Server error' }).code(500);
@@ -66,7 +74,13 @@ exports.login = async (request, h) => {
             return h.response({ error: 'Invalid email or password' }).code(401);
         }
 
-        return h.response({ message: 'Login successful', user: { email: user.email } }).code(200);
+        // Buat JWT token untuk user yang berhasil login
+        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+
+        return h.response({ 
+            message: 'Login successful',
+            token 
+        }).code(200);
     } catch (error) {
         console.error(error);
         return h.response({ error: 'Server error' }).code(500);
