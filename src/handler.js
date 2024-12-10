@@ -87,6 +87,7 @@ exports.login = async (request, h) => {
     }
 };
 
+
 exports.getUserEmail = async (request, h) => {
     const { userId } = request.params;
 
@@ -109,22 +110,38 @@ exports.getUserEmail = async (request, h) => {
 };
 
 exports.getFoods = async (request, h) => {
-    const { category, maxPrice } = request.query;
+    const { category, maxTime, ingredients, page = 1, limit = 10 } = request.query;
 
     try {
-        let sql = 'SELECT * FROM recipes WHERE 1=1';
+        let sql = 'SELECT recipes_id, recipe_name, prep_time, cook_time, total_time, servings, yield, ingredients, directions, cuisine_path, nutrition, timing, rating, img_src FROM recipes WHERE 1=1';
         const params = [];
 
+        // Filter berdasarkan kategori (cuisine_path)
         if (category) {
-            sql += ' AND category = ?';
+            sql += ' AND cuisine_path = ?';
             params.push(category);
         }
 
-        if (maxPrice) {
-            sql += ' AND price <= ?';
-            params.push(parseInt(maxPrice));
+        // Filter berdasarkan waktu maksimal (total_time)
+        if (maxTime) {
+            sql += ' AND total_time <= ?';
+            params.push(parseInt(maxTime));
         }
 
+        // Filter berdasarkan ingredients
+        if (ingredients) {
+            sql += ' AND ingredients LIKE ?';
+            params.push(`%${ingredients}%`); // Pencarian dengan wildcard
+        }
+
+        // Hitung offset untuk pagination
+        const offset = (page - 1) * limit;
+
+        // Tambahkan LIMIT dan OFFSET untuk pagination
+        sql += ' LIMIT ? OFFSET ?';
+        params.push(parseInt(limit), parseInt(offset));
+
+        // Query untuk mendapatkan data makanan
         const foods = await new Promise((resolve, reject) => {
             db.query(sql, params, (error, results) => {
                 if (error) return reject(error);
@@ -132,12 +149,53 @@ exports.getFoods = async (request, h) => {
             });
         });
 
-        return h.response(foods).code(200);
+        // Query untuk menghitung total data
+        let totalQuery = 'SELECT COUNT(*) AS total FROM recipes WHERE 1=1';
+        const totalParams = [];
+
+        if (category) {
+            totalQuery += ' AND cuisine_path = ?';
+            totalParams.push(category);
+        }
+
+        if (maxTime) {
+            totalQuery += ' AND total_time <= ?';
+            totalParams.push(parseInt(maxTime));
+        }
+
+        if (ingredients) {
+            totalQuery += ' AND ingredients LIKE ?';
+            totalParams.push(`%${ingredients}%`);
+        }
+
+        const total = await new Promise((resolve, reject) => {
+            db.query(totalQuery, totalParams, (error, results) => {
+                if (error) return reject(error);
+                resolve(results[0].total);
+            });
+        });
+
+        // Hitung total halaman
+        const totalPages = Math.ceil(total / limit);
+
+        // Kembalikan respons
+        return h.response({
+            status: 'success',
+            data: foods,
+            pagination: {
+                currentPage: parseInt(page, 10),
+                totalPages,
+                totalItems: total,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+            },
+        }).code(200);
     } catch (error) {
         console.error(error);
         return h.response({ error: 'Server error' }).code(500);
     }
 };
+
 
 exports.getFoodDetail = async (request, h) => {
     const { id } = request.params;
