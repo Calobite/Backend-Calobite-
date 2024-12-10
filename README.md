@@ -2,15 +2,6 @@
 
 <br>
 
-## Cloud Computing Team
-
-| Bangkit ID | Name | Learning Path | University |
-| ---      | ---       | ---       | ---       | 
-| C183B4KY0426 | Alvin Christ Yudantama | Cloud Computing | Universitas Amikom Yogyakarta |
-| C183B4KY3928 | Rizky Fadly Pramudya Wardana |  Cloud Computing | Universitas Amikom Yogyakarta |
-
-<br>
-
 ## Tech
 ### Tools
 - Visual Studio Code
