@@ -31,6 +31,12 @@ GET /foods/{id}
 ```
 <br>
 
+Get Food By Ingredients :
+```bash
+GET /foods?ingredients={ingredients name}
+```
+<br>
+
 ### Ingredients Management
 Get Ingredients :
 ```bash
