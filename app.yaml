@@ -3,7 +3,7 @@ instance_class: F2
 service: default
 
 env_variables:
-    MYSQL_HOST: "34.128.92.233"
+    MYSQL_HOST: "34.50.94.179"
     MYSQL_USER: "root"
     MYSQL_PASSWORD: "123calobite123"
     MYSQL_DATABASE: "calobite"
