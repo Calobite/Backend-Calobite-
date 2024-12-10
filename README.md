@@ -1,8 +1,40 @@
-# Calobite
+# Calobite -- C242-PS311 
+
+<br>
+
+## Cloud Computing Team
+
+| Bangkit ID | Name | Learning Path | University |
+| ---      | ---       | ---       | ---       | 
+| C183B4KY0426 | Alvin Christ Yudantama | Cloud Computing | Universitas Amikom Yogyakarta |
+| C183B4KY3928 | Rizky Fadly Pramudya Wardana |  Cloud Computing | Universitas Amikom Yogyakarta |
+
+<br>
+
+## Tech
+### Tools
+- Visual Studio Code
+- Postman
+- Google Cloud Platform - Console
+
+### Libraries
+- Node.js = A JavaScript runtime built on Chrome's V8 engine. It allows developers to run JavaScript on the server-side, enabling the creation of scalable and high-performance web applications.
+- @hapi/hapi = A server-side framework for Node.js used to easily create HTTP servers. It is ideal for building REST APIs or backend applications.
+- @hapi/joi = A library for data validation, ensuring that user-supplied data complies with specified formats or rules.
+- bcryptjs = A library for hashing data, mainly used for hashing passwords. It ensures sensitive data is not stored in plain text.
+- jsonwebtoken = Used to create and verify JSON Web Tokens (JWT), which are commonly utilized for token-based authentication.
+- mysql2 = A library for connecting to and interacting with MySQL databases. It supports modern features like prepared statements and promises.
+
+### Google Cloud Service
+- App Engine : For Backend and Machine Learning API services.
+- Google Cloud Storage : For storing unstructure data.
+- Cloud SQL : For storing our database API
+
+<br>
 
 ## Endpoints API
-
 ### User Management
+
 Register User :
 ```bash
 POST /register
@@ -29,7 +61,6 @@ Get Food Detail :
 ```bash
 GET /foods/{id}
 ```
-<br>
 
 Get Food By Ingredients :
 ```bash
